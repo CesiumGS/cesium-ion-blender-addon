@@ -10,15 +10,10 @@ bl_info = {
 
 import bpy
 from bpy.props import *
-from bpy.types import (
-    Panel,
-    PropertyGroup,
-    Operator
-)
+from bpy.types import (Panel, PropertyGroup, Operator)
 
 import requests
 from urllib.parse import urlencode
-
 """
 SERVER.PY
 """
@@ -27,6 +22,7 @@ from socketserver import ThreadingMixIn
 from urllib.parse import parse_qs
 from threading import Thread
 from os import path
+
 
 class OAuthClientServer(object):
     def __init__(self, address, port, listener=(lambda code: code)):
@@ -70,10 +66,8 @@ class OAuthClientServer(object):
 
         self._server = HTTPServer((self._address, self._port), TokenHandler)
 
-        self._server_thread = Thread(
-            target=self._server.serve_forever,
-            args=(0.01,)
-        )
+        self._server_thread = Thread(target=self._server.serve_forever,
+                                     args=(0.01, ))
         # Exit the server thread when the main thread terminates
         self._server_thread.daemon = True
         self._server_thread.start()
@@ -86,16 +80,19 @@ class OAuthClientServer(object):
         self._server_thread.join()
         self._server_thread = None
         self._server = None
+
+
 """
 SERVER.PY
 """
 
-APP_CATEGORY="Cesium Ion"
-CLIENT_ID="4"
-ION_ADDRESS="http://composer.test:8081"
-API_ADDRESS="http://api.composer.test:8081"
-REDIRECT_ADDRESS="localhost"
-REDIRECT_PORT=10101
+APP_CATEGORY = "Cesium Ion"
+CLIENT_ID = "4"
+ION_ADDRESS = "http://composer.test:8081"
+API_ADDRESS = "http://api.composer.test:8081"
+REDIRECT_ADDRESS = "localhost"
+REDIRECT_PORT = 10101
+
 
 class OAuthOperator(Operator):
     bl_label = "Open Cesium Authorization"
@@ -120,19 +117,18 @@ class OAuthOperator(Operator):
         client_id = self.client_id
         redirect_uri = self.redirect_uri
         code_verifier = self.code_verifier
+
         def oauth_listener(code):
-            bpy.ops.csm.get_token(
-                client_id=client_id,
-                code=code,
-                code_verifier=code_verifier,
-                redirect_uri=redirect_uri
-            )
+            bpy.ops.csm.get_token(client_id=client_id,
+                                  code=code,
+                                  code_verifier=code_verifier,
+                                  redirect_uri=redirect_uri)
 
         server.set_listener(oauth_listener)
         server.start()
         webbrowser.open_new(f"{ION_ADDRESS}/ion/oauth?{params}")
 
-        return { "FINISHED" }
+        return {"FINISHED"}
 
     @property
     def code_challenge(self):
@@ -148,9 +144,10 @@ class OAuthOperator(Operator):
         import random, string
         self.client_id = CLIENT_ID
         self.redirect_uri = f"http://{REDIRECT_ADDRESS}:{REDIRECT_PORT}/"
-        self.code_verifier = str("".join(random.choices(string.ascii_letters
-            + string.digits, k=32)))
+        self.code_verifier = str("".join(
+            random.choices(string.ascii_letters + string.digits, k=32)))
         return self.execute(context)
+
 
 class GetTokenOperator(Operator):
     bl_label = "Cesium Token Fetch"
@@ -175,15 +172,15 @@ class GetTokenOperator(Operator):
         output = req.json()
 
         if req.status_code != 200:
-            self.report({ "ERROR" }, "Authorization failed")
-            return { "CANCELLED" }
+            self.report({"ERROR"}, "Authorization failed")
+            return {"CANCELLED"}
         if "access_token" not in output:
-            self.report({ "ERROR" }, "Invalid access token")
-            return { "CANCELLED" }
+            self.report({"ERROR"}, "Invalid access token")
+            return {"CANCELLED"}
 
         context.scene.csm_user.token = output["access_token"]
 
-        return { "FINISHED" }
+        return {"FINISHED"}
 
 
 class ClearTokenOperator(Operator):
@@ -193,10 +190,12 @@ class ClearTokenOperator(Operator):
     def execute(self, context):
         context.scene.csm_user.token = ""
 
-        return { "FINISHED" }
+        return {"FINISHED"}
+
 
 def destructure(d, *keys):
-    return [ d[k] if k in d else None for k in keys ]
+    return [d[k] if k in d else None for k in keys]
+
 
 class S3ProgressPercentage(object):
     def __init__(self, filename, context):
@@ -211,91 +210,6 @@ class S3ProgressPercentage(object):
             percentage = (self._seen_so_far / self._size) * 100
 
 
-class IonUploader(object):
-    @staticmethod
-    def _setup_vendor():
-        try:
-            boto3
-        except:
-            import os, sys
-
-            # Add vendor directory to module search path
-            parent_dir = os.path.abspath(os.path.dirname(__file__))
-            vendor_dir = os.path.join(parent_dir, "vendor")
-
-            sys.path.append(vendor_dir)
-
-    def __init__(self, token, name, description="", attribution=""):
-        self._token = token
-        self._name = name
-        self._description = description
-        self._attribution = attribution
-        self._session = None
-
-    @property
-    def headers(self):
-        return { "Authorization": f"Bearer {self._token}" }
-
-    @property
-    def has_session(self):
-        return self._session is not None
-
-    def init(self):
-        data = {
-            "name": self._name,
-            "description": self._description,
-            "attribution": self._attribution,
-            "type": "3DTILES",
-            "options": { "sourceType": "3D_MODEL", "textureFormat": "AUTO" }
-        }
-
-        req = requests.post(f"{API_ADDRESS}/v1/assets",
-            json=data, headers=self.headers)
-        if req.status_code != 200:
-            return "Unable to create upload session"
-        self._session = req.json()
-
-        return "SUCCESS"
-
-    def upload(self, file_path):
-        if not self.has_session:
-            return "No current session"
-
-        IonUploader._setup_vendor()
-        import boto3
-
-        access_key, secret_key, token, endpoint, bucket, prefix = destructure(
-            self._session["uploadLocation"],
-            "accessKey", "secretAccessKey", "sessionToken",
-            "endpoint", "bucket", "prefix"
-        )
-        key = path.join(prefix, "blender.glb")
-        boto3.client("s3",
-            endpoint_url=endpoint,
-            aws_access_key_id=access_key,
-            aws_secret_access_key=secret_key,
-            aws_session_token=token)\
-            .upload_file(file_path, Bucket=bucket, Key=key)
-
-        method, url, fields = destructure(self._session["onComplete"],
-            "method", "url", "fields")
-        res = requests.request(method, url=url,
-            headers=self.headers, data=fields)
-        if res.status_code // 100 != 2:
-            return "Bad completion status"
-
-        return "SUCCESS"
-
-    def open_viewer(self):
-        import webbrowser
-        if not self.has_session:
-            return "No current session"
-        asset_id = self._session["assetMetadata"]["id"]
-        url = path.join(ION_ADDRESS, "ion/assets", str(asset_id))
-        webbrowser.open_new(url)
-        return "SUCCESS"
-
-
 class ExportUploadOperator(Operator):
     bl_label = "Cesium Clear Token"
     bl_idname = "csm.upload_gltf"
@@ -308,7 +222,7 @@ class ExportUploadOperator(Operator):
     def report_on_fail(self, out):
         if out == "SUCCESS":
             return
-        if isinstance({ out }, str):
+        if isinstance({out}, str):
             self.report("ERROR", out)
         raise BaseException(out)
 
@@ -317,25 +231,25 @@ class ExportUploadOperator(Operator):
 
         csm_user, csm_export = context.scene.csm_user, context.scene.csm_export
 
-        self.report({ "INFO" }, "Preparing upload...")
+        self.report({"INFO"}, "Preparing upload...")
         uploader = IonUploader(csm_user.token, csm_export.name,
-            csm_export.description, csm_export.attribution)
+                               csm_export.description, csm_export.attribution)
         self.report_on_fail(uploader.init())
 
         with NamedTemporaryFile() as tmp_file:
             file_name = tmp_file.name
 
-            self.report({ "INFO" }, "Exporting Project...")
+            self.report({"INFO"}, "Exporting Project...")
             bpy.ops.export_scene.gltf(filepath=file_name)
             file_name += ".glb"
 
-            self.report({ "INFO" }, "Uploading Output...")
+            self.report({"INFO"}, "Uploading Output...")
             self.report_on_fail(uploader.upload(file_name))
             self.report_on_fail(uploader.open_viewer())
 
-            self.report({ "INFO" }, "Finished!")
+            self.report({"INFO"}, "Finished!")
 
-        return { "FINISHED" }
+        return {"FINISHED"}
 
 
 class UserProperties(PropertyGroup):
@@ -364,10 +278,12 @@ class UserPanel(Panel):
 
 class ExportProperties(PropertyGroup):
     name: StringProperty(name="Name", description="Title for the upload")
-    description: StringProperty(name="Desc", description="Give an " +
-        "overview of the contents of the data")
-    attribution: StringProperty(name="Attrib", description="Provide data " +
-        "attribution")
+    description: StringProperty(name="Desc",
+                                description="Give an " +
+                                "overview of the contents of the data")
+    attribution: StringProperty(name="Attrib",
+                                description="Provide data " + "attribution")
+
 
 class ExportPanel(Panel):
     bl_idname = "CESIUM_PT_export"
@@ -389,15 +305,19 @@ class ExportPanel(Panel):
 
 
 # Sanity check for server death
-try:server.stop()
-except:pass
+try:
+    server.stop()
+except:
+    pass
 
 classes = [
-    OAuthOperator, UserProperties, UserPanel, ExportProperties,
-    ExportPanel, GetTokenOperator, ClearTokenOperator, ExportUploadOperator
+    OAuthOperator, UserProperties, UserPanel, ExportProperties, ExportPanel,
+    GetTokenOperator, ClearTokenOperator, ExportUploadOperator
 ]
-register_classes, unregister_classes = bpy.utils.register_classes_factory(classes)
+register_classes, unregister_classes = bpy.utils.register_classes_factory(
+    classes)
 server = OAuthClientServer(REDIRECT_ADDRESS, REDIRECT_PORT)
+
 
 def register():
     import os
@@ -405,9 +325,11 @@ def register():
     bpy.types.Scene.csm_user = PointerProperty(type=UserProperties)
     bpy.types.Scene.csm_export = PointerProperty(type=ExportProperties)
 
+
 def unregister():
     unregister_classes()
     server.stop()
+
 
 if __name__ == "__main__":
     register()
