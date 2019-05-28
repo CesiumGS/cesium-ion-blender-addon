@@ -10,8 +10,10 @@ bl_info = {
 
 import bpy
 from bpy.props import PointerProperty
+
 from .operators import *
 from .panels import *
+from .cache import PropertyLoadWorker
 
 __classes__ = [
     OAuthOperator, UserProperties, UserPanel, ExportProperties, ExportPanel,
@@ -26,6 +28,7 @@ def register():
     register_classes()
     bpy.types.Scene.csm_user = PointerProperty(type=UserProperties)
     bpy.types.Scene.csm_export = PointerProperty(type=ExportProperties)
+    PropertyLoadWorker().start()
 
 
 def unregister():

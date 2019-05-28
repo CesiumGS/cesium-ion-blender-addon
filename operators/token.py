@@ -1,8 +1,10 @@
+import bpy
 from bpy.types import Operator
 from bpy.props import *
 import requests
 
 from ..globals import (APP_OPERATOR_PREFIX, API_ADDRESS, CLIENT_ID)
+from ..cache import save_properties
 
 
 class GetTokenOperator(Operator):
@@ -35,6 +37,20 @@ class GetTokenOperator(Operator):
             self.report({"ERROR"}, "Invalid access token")
             return {"CANCELLED"}
 
-        context.scene.csm_user.token = output["access_token"]
+        csm_user = context.scene.csm_user
+        csm_user.token = output["access_token"]
+        save_properties(csm_user)
+
+        return {"FINISHED"}
+
+
+class ClearTokenOperator(Operator):
+    bl_label = "Cesium Clear Token"
+    bl_idname = f"{APP_OPERATOR_PREFIX}.clear_token"
+
+    def execute(self, context):
+        csm_user = context.scene.csm_user
+        csm_user.token = ""
+        save_properties(csm_user)
 
         return {"FINISHED"}

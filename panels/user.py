@@ -1,3 +1,4 @@
+import bpy
 from bpy.props import *
 from bpy.types import (Panel, PropertyGroup)
 
@@ -19,7 +20,8 @@ class UserPanel(Panel):
     def draw(self, context):
 
         layout = self.layout
-        csm_user_len = len(context.scene.csm_user.token)
+        csm_user = context.scene.csm_user
+        csm_user_len = len(csm_user.token)
         status_text = "Linked" if csm_user_len > 0 else "Disconnected"
         layout.row().label(text=f"Status: {status_text}")
 
