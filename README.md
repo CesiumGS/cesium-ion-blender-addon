@@ -7,8 +7,8 @@ Blender add-on for uploading and tiling models with Cesium ion. https://cesium.c
 3. Enable Add-on
 
 ## Todo
-- Code Separation
-- Add Login Caching
+- ~~Code Separation~~
+- ~~Add Login Caching~~
 - Add Menu File export
 - Add Export Options
 - Screenshots

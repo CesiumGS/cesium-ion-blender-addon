@@ -27,7 +27,6 @@ def save_properties(prop_group):
     save_path = get_path(prop_group)
     props = prop_group.__annotations__.keys()
     data = {prop: prop_group[prop] for prop in props}
-    print(save_path, data)
     with open(save_path, "w") as write_file:
         json.dump(data, write_file)
 
@@ -40,7 +39,6 @@ def load_properties(prop_group):
         data = json.load(read_file)
         for key in data.keys():
             prop_group[key] = data[key]
-        print(data, data.keys())
     return prop_group
 
 
