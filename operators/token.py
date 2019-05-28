@@ -10,6 +10,7 @@ from ..cache import save_properties
 class GetTokenOperator(Operator):
     bl_label = "Cesium Token Fetch"
     bl_idname = f"{APP_OPERATOR_PREFIX}.get_token"
+    bl_options = {'INTERNAL'}
 
     api_address: StringProperty(default=API_ADDRESS)
     client_id: StringProperty(default=CLIENT_ID)
@@ -37,7 +38,7 @@ class GetTokenOperator(Operator):
             self.report({"ERROR"}, "Invalid access token")
             return {"CANCELLED"}
 
-        csm_user = context.scene.csm_user
+        csm_user = context.window_manager.csm_user
         csm_user.token = output["access_token"]
         save_properties(csm_user)
 
@@ -47,9 +48,10 @@ class GetTokenOperator(Operator):
 class ClearTokenOperator(Operator):
     bl_label = "Cesium Clear Token"
     bl_idname = f"{APP_OPERATOR_PREFIX}.clear_token"
+    bl_options = {'INTERNAL'}
 
     def execute(self, context):
-        csm_user = context.scene.csm_user
+        csm_user = context.window_manager.csm_user
         csm_user.token = ""
         save_properties(csm_user)
 

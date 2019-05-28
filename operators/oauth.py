@@ -10,6 +10,7 @@ from ..globals import (APP_OPERATOR_PREFIX, ION_ADDRESS, REDIRECT_ADDRESS,
 class OAuthOperator(Operator):
     bl_label = "Open Cesium Authorization"
     bl_idname = f"{APP_OPERATOR_PREFIX}.oauth"
+    bl_options = {'INTERNAL'}
 
     oauth_address: StringProperty(default=ION_ADDRESS)
     client_id: StringProperty(default=CLIENT_ID)

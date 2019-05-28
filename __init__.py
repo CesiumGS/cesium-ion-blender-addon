@@ -10,10 +10,11 @@ bl_info = {
 
 import bpy
 from bpy.props import PointerProperty
+from bpy.app.handlers import persistent
 
 from .operators import *
 from .panels import *
-from .cache import PropertyLoadWorker
+from .cache import load_properties
 
 __classes__ = [
     OAuthOperator, UserProperties, UserPanel, ExportProperties, ExportPanel,
@@ -26,15 +27,20 @@ register_classes, unregister_classes = bpy.utils\
 
 def register():
     register_classes()
-    bpy.types.Scene.csm_user = PointerProperty(type=UserProperties)
+    bpy.types.WindowManager.csm_user = PointerProperty(type=UserProperties)
     bpy.types.Scene.csm_export = PointerProperty(type=ExportProperties)
-    PropertyLoadWorker().start()
+
+    @persistent
+    def on_load(ignore):
+        load_properties(bpy.context.window_manager.csm_user)
+
+    bpy.app.handlers.load_post.append(on_load)
 
 
 def unregister():
     ExportUploadOperator.stop()
     unregister_classes()
-    del bpy.types.Scene.csm_user
+    del bpy.types.WindowManager.csm_user
     del bpy.types.Scene.csm_export
 
 

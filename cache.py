@@ -40,15 +40,3 @@ def load_properties(prop_group):
         for key in data.keys():
             prop_group[key] = data[key]
     return prop_group
-
-
-class PropertyLoadWorker(Thread):
-    def run(self):
-        failed = True
-        while failed:
-            failed = False
-            try:
-                bpy.context.scene.csm_user
-            except:
-                failed = True
-        load_properties(bpy.context.scene.csm_user)
