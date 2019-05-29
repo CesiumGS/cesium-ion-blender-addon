@@ -38,7 +38,7 @@ class S3ProgressPercentage(object):
 class ExportUploadOperator(Operator):
     bl_label = "gltf to Cesium uploader"
     bl_idname = f"{APP_OPERATOR_PREFIX}.upload_gltf"
-    bl_description = "Uploads \".glb\" exports to Cesium Ion"
+    bl_description = "Uploads \".glb\" exports to Cesium ion"
 
     api_address: StringProperty(default=API_ADDRESS)
     ion_address: StringProperty(default=ION_ADDRESS)
@@ -59,10 +59,6 @@ class ExportUploadOperator(Operator):
             vendor_dir = path.join(parent_dir, "vendor")
 
             sys.path.append(vendor_dir)
-
-    @staticmethod
-    def stop():
-        ExportUploadOperator._server.stop()
 
     @classmethod
     def poll(self, context):

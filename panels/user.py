@@ -1,24 +1,13 @@
 import bpy
 from bpy.props import *
-from bpy.types import (Panel, PropertyGroup)
+from bpy.types import (Panel, PropertyGroup, AddonPreferences)
 
 from ..operators import (OAuthOperator, ClearTokenOperator)
-from ..globals import APP_CATEGORY
+from ..globals import (APP_CATEGORY, APP_PACKAGE)
 
 
-class UserProperties(PropertyGroup):
-    token: StringProperty()
-
-
-class UserPanel(Panel):
-    bl_idname = "CESIUM_PT_user"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_label = "Account"
-    bl_category = APP_CATEGORY
-
+class AccountManageMixin(object):
     def draw(self, context):
-
         layout = self.layout
         csm_user = context.window_manager.csm_user
         csm_user_len = len(csm_user.token)
@@ -29,3 +18,30 @@ class UserPanel(Panel):
             layout.operator(OAuthOperator.bl_idname, text="Authorize")
         else:
             layout.operator(ClearTokenOperator.bl_idname, text="Logout")
+
+
+class UserProperties(PropertyGroup):
+    token: StringProperty()
+
+
+class UserPreferences(AccountManageMixin, AddonPreferences):
+    bl_idname = APP_PACKAGE
+
+    def draw(self, context):
+        super().draw(context)
+
+        layout = self.layout
+        layout.separator()
+        layout.label(
+            text="Exporting to Cesium ion will not work unless " +
+            "authorization has completed. Please ensure that the above " +
+            "text says \"Linked\". For more information, checkout the " +
+            "documentation.")
+
+
+class UserPanel(AccountManageMixin, Panel):
+    bl_idname = "CESIUM_PT_user"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Account"
+    bl_category = APP_CATEGORY

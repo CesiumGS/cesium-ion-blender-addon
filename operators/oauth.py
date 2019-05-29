@@ -19,6 +19,10 @@ class OAuthOperator(Operator):
 
     _server = OAuthServer(REDIRECT_ADDRESS, REDIRECT_PORT)
 
+    @staticmethod
+    def stop():
+        OAuthOperator._server.stop()
+
     def execute(self, context):
         import webbrowser
         from urllib.parse import urlencode

@@ -1,5 +1,6 @@
-APP_CATEGORY = "Cesium Ion"
+APP_CATEGORY = "Cesium ion"
 APP_OPERATOR_PREFIX = "csm"
+APP_PACKAGE = __package__
 LOCAL = True
 if LOCAL:
     CLIENT_ID = "4"

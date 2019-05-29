@@ -32,4 +32,4 @@ class ExportPanel(Panel):
         layout.prop(scene.csm_export, "description")
         layout.prop(scene.csm_export, "attribution")
 
-        layout.operator(ExportUploadOperator.bl_idname, text="Upload to Ion")
+        layout.operator(ExportUploadOperator.bl_idname, text="Upload to ion")

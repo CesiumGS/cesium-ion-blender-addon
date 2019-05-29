@@ -1,12 +1,35 @@
 bl_info = {
     "name": "Cesium Ion",
-    "description": "Cesium Ion Exporting Tool",
+    "description":
+    "Upload and tile models with Cesium ion. https://cesium.com",
     "author": "",
     "version": (0, 1),
     "blender": (2, 80, 0),
     "location": "View3D",
     "category": "Import-Export"
 }
+
+
+# RELOAD PACKAGE on Refresh
+def reload_package(module_dict_main):
+    import importlib
+    from pathlib import Path
+
+    def reload_package_recursive(current_dir, module_dict):
+        for path in current_dir.iterdir():
+            if "__init__" in str(path) or path.stem not in module_dict:
+                continue
+
+            if path.is_file() and path.suffix == ".py":
+                importlib.reload(module_dict[path.stem])
+            elif path.is_dir():
+                reload_package_recursive(path, module_dict[path.stem].__dict__)
+
+    reload_package_recursive(Path(__file__).parent, module_dict_main)
+
+
+if "bpy" in locals():
+    reload_package(locals())
 
 import bpy
 from bpy.props import PointerProperty
@@ -17,8 +40,8 @@ from .panels import *
 from .cache import load_properties
 
 __classes__ = [
-    OAuthOperator, UserProperties, UserPanel, ExportProperties, ExportPanel,
-    GetTokenOperator, ClearTokenOperator, ExportUploadOperator
+    UserProperties, UserPanel, ExportProperties, ExportPanel, OAuthOperator,
+    GetTokenOperator, ClearTokenOperator, ExportUploadOperator, UserPreferences
 ]
 
 register_classes, unregister_classes = bpy.utils\
@@ -40,17 +63,15 @@ def register():
     # Handle save menu path
     def create_menu(self, context):
         self.layout.operator(ExportUploadOperator.bl_idname,
-                             text="Upload to Cesium Ion")
+                             text="Upload to Cesium ion")
+
+    print(bpy.types)
 
     bpy.types.TOPBAR_MT_file_export.append(create_menu)
 
 
 def unregister():
-    ExportUploadOperator.stop()
     unregister_classes()
     del bpy.types.WindowManager.csm_user
     del bpy.types.Scene.csm_export
-
-
-if __name__ == "__main__":
-    register()
+    OAuthOperator.stop()
