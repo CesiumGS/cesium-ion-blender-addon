@@ -32,7 +32,7 @@ class AbstractTokenHandler(BaseHTTPRequestHandler):
 
 
 class OAuthServer(object):
-    def __init__(self, address, port, listener=(lambda code: code)):
+    def __init__(self, address, port, listener=(lambda code: None)):
         self._address = address
         self._port = port
         self._listener = listener
@@ -45,6 +45,8 @@ class OAuthServer(object):
             and self._server_thread.is_alive()
 
     def set_listener(self, listener):
+        if listener is None:
+            listener = lambda code: None
         self._listener = listener
 
     def start(self):

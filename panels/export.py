@@ -16,13 +16,7 @@ class ExportProperties(PropertyGroup):
                                 description="Provide data " + "attribution")
 
 
-class ExportPanel(Panel):
-    bl_idname = "CESIUM_PT_export"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_label = "Export"
-    bl_category = APP_CATEGORY
-
+class ExportManageMixin(object):
     def draw(self, context):
 
         layout = self.layout
@@ -32,4 +26,15 @@ class ExportPanel(Panel):
         layout.prop(scene.csm_export, "description")
         layout.prop(scene.csm_export, "attribution")
 
-        layout.operator(ExportUploadOperator.bl_idname, text="Upload to ion")
+
+class ExportPanel(ExportManageMixin, Panel):
+    bl_idname = "CESIUM_PT_export"
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_label = "Export"
+    bl_category = APP_CATEGORY
+
+    def draw(self, context):
+        super().draw(context)
+        self.layout.operator(ExportUploadOperator.bl_idname,
+                             text="Upload to ion")

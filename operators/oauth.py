@@ -18,10 +18,17 @@ class OAuthOperator(Operator):
     code_verifier: StringProperty()
 
     _server = OAuthServer(REDIRECT_ADDRESS, REDIRECT_PORT)
+    _listener = lambda code: None
 
     @staticmethod
     def stop():
         OAuthOperator._server.stop()
+
+    @staticmethod
+    def set_listener(listener):
+        if listener is None:
+            listener = lambda code: None
+        OAuthOperator._listener = listener
 
     def execute(self, context):
         import webbrowser
@@ -45,6 +52,7 @@ class OAuthOperator(Operator):
                                   code=code,
                                   code_verifier=code_verifier,
                                   redirect_uri=redirect_uri)
+            OAuthOperator._listener(code)
 
         OAuthOperator._server.set_listener(oauth_listener)
         OAuthOperator._server.start()

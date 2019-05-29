@@ -37,7 +37,7 @@ class S3ProgressPercentage(object):
 
 class ExportUploadOperator(Operator):
     bl_label = "gltf to Cesium uploader"
-    bl_idname = f"{APP_OPERATOR_PREFIX}.upload_gltf"
+    bl_idname = f"{APP_OPERATOR_PREFIX}.upload"
     bl_description = "Uploads \".glb\" exports to Cesium ion"
 
     api_address: StringProperty(default=API_ADDRESS)
@@ -84,7 +84,7 @@ class ExportUploadOperator(Operator):
                 "textureFormat": "AUTO"
             }
         }
-        req = requests.post(f"{API_ADDRESS}/v1/assets",
+        req = requests.post(f"{self.api_address}/v1/assets",
                             json=data,
                             headers=self.headers)
         if req.status_code != 200:
@@ -153,6 +153,7 @@ class ExportUploadOperator(Operator):
 
             self.report({"INFO"}, "Finished!")
 
+        self.session = None
         return {"FINISHED"}
 
     def invoke(self, context, event):
@@ -161,5 +162,4 @@ class ExportUploadOperator(Operator):
         self.name = csm_export.name
         self.description = csm_export.description
         self.attribution = csm_export.attribution
-        self.session = None
         return self.execute(context)

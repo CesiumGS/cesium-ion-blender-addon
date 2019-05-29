@@ -27,17 +27,6 @@ class UserProperties(PropertyGroup):
 class UserPreferences(AccountManageMixin, AddonPreferences):
     bl_idname = APP_PACKAGE
 
-    def draw(self, context):
-        super().draw(context)
-
-        layout = self.layout
-        layout.separator()
-        layout.label(
-            text="Exporting to Cesium ion will not work unless " +
-            "authorization has completed. Please ensure that the above " +
-            "text says \"Linked\". For more information, checkout the " +
-            "documentation.")
-
 
 class UserPanel(AccountManageMixin, Panel):
     bl_idname = "CESIUM_PT_user"
