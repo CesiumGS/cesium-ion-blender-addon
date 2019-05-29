@@ -30,11 +30,19 @@ def register():
     bpy.types.WindowManager.csm_user = PointerProperty(type=UserProperties)
     bpy.types.Scene.csm_export = PointerProperty(type=ExportProperties)
 
+    # Update login persistence
     @persistent
     def on_load(ignore):
         load_properties(bpy.context.window_manager.csm_user)
 
     bpy.app.handlers.load_post.append(on_load)
+
+    # Handle save menu path
+    def create_menu(self, context):
+        self.layout.operator(ExportUploadOperator.bl_idname,
+                             text="Upload to Cesium Ion")
+
+    bpy.types.TOPBAR_MT_file_export.append(create_menu)
 
 
 def unregister():

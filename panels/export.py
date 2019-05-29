@@ -6,7 +6,9 @@ from ..globals import APP_CATEGORY
 
 
 class ExportProperties(PropertyGroup):
-    name: StringProperty(name="Name", description="Title for the upload")
+    name: StringProperty(name="Name",
+                         default="Untitled",
+                         description="Title for the upload")
     description: StringProperty(name="Desc",
                                 description="Give an " +
                                 "overview of the contents of the data")

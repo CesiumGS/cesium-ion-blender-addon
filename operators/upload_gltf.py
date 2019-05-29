@@ -36,8 +36,9 @@ class S3ProgressPercentage(object):
 
 
 class ExportUploadOperator(Operator):
-    bl_label = "Cesium Clear Token"
+    bl_label = "gltf to Cesium uploader"
     bl_idname = f"{APP_OPERATOR_PREFIX}.upload_gltf"
+    bl_description = "Uploads \".glb\" exports to Cesium Ion"
 
     api_address: StringProperty(default=API_ADDRESS)
     ion_address: StringProperty(default=ION_ADDRESS)
@@ -64,7 +65,7 @@ class ExportUploadOperator(Operator):
         ExportUploadOperator._server.stop()
 
     @classmethod
-    def poll(cls, context):
+    def poll(self, context):
         csm_user, csm_export = context.window_manager.csm_user, context.scene.csm_export
         return len(csm_user.token) > 0 and len(csm_export.name) > 0
 
