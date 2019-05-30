@@ -6,8 +6,8 @@ from ..globals import APP_CATEGORY
 
 SOURCE_TYPES = [
     ("3D_MODEL", "3D Model", "Models designed through blender", "FILE_3D", 1),
-    ("3D_CAPTURE", "3D Capture",
-     "Model created through photogrammetry processes", "CAMERA_DATA", 2)
+    ("3D_CAPTURE", "3D Capture", "Model created through 3D capture such as " +
+     "scanning, LIDAR, photogrammetry, etc...", "CAMERA_DATA", 2)
 ]
 
 
@@ -23,7 +23,7 @@ class ExportProperties(PropertyGroup):
                               description="Type of data being uploaded",
                               items=lambda self, context: SOURCE_TYPES)
     webp_textures: BoolProperty(
-        name="Convert to WebP",
+        name="Use WebP images",
         default=False,
         description=
         "Will produce WebP images, which are typically 25-34% smaller than " +
@@ -41,29 +41,33 @@ class ExportPanel(Panel):
     bl_label = APP_CATEGORY
     bl_category = APP_CATEGORY
 
+    def required_prop(self, property_group, property_id):
+        self.layout.prop(property_group, property_id)
+        if len(getattr(property_group, property_id)) <= 0:
+            row = self.layout.row()
+            row.alignment = "CENTER"
+            name = property_group.__annotations__[property_id][1]["name"]
+            row.label(text=f"{name} is required.", icon="ERROR")
+
     def draw(self, context):
         layout = self.layout
+        layout.alignment = "LEFT"
 
         csm_export = context.scene.csm_export
         csm_user_len = len(context.window_manager.csm_user.token)
 
         if csm_user_len > 0:
-            layout = self.layout
-            scene = context.scene
 
-            layout.prop(scene.csm_export, "name")
-            if len(csm_export.name) <= 0:
-                layout.label(text="Name is required.")
-
-            layout.prop(scene.csm_export, "description")
-            layout.prop(scene.csm_export, "attribution")
+            self.required_prop(csm_export, "name")
+            layout.prop(csm_export, "description")
+            layout.prop(csm_export, "attribution")
             layout.separator()
-            layout.prop(scene.csm_export, "source_type")
-            if csm_export.source_type is "":
-                layout.label(text="Model Type is required.")
+            self.required_prop(csm_export, "source_type")
 
-            layout.prop(scene.csm_export, "webp_textures")
+            layout.prop(csm_export, "webp_textures")
             layout.operator(ExportUploadOperator.bl_idname,
-                            text="Upload to ion")
+                            text="Upload to Cesium ion")
         else:
-            layout.operator(OAuthOperator.bl_idname, text="Login")
+            layout.operator(OAuthOperator.bl_idname,
+                            text="Login",
+                            icon="EXPORT")

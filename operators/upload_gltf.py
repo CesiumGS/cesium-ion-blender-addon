@@ -38,7 +38,7 @@ class S3ProgressPercentage(object):
 class ExportUploadOperator(Operator):
     bl_label = "gltf to Cesium uploader"
     bl_idname = f"{APP_OPERATOR_PREFIX}.upload_gltf"
-    bl_description = "Uploads \".glb\" exports to Cesium ion"
+    bl_description = "Uploads your model to Cesium ion for 3D Tiling"
 
     api_address: StringProperty(default=API_ADDRESS)
     ion_address: StringProperty(default=ION_ADDRESS)

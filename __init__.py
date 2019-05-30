@@ -3,7 +3,7 @@ bl_info = {
     "description":
     "Upload and tile models with Cesium ion. https://cesium.com",
     "author": "Analytical Graphics, Inc.",
-    "version": (0, 1),
+    "version": (1, 0),
     "blender": (2, 80, 0),
     "location": "View3D",
     "category": "Import-Export"
