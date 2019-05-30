@@ -143,18 +143,22 @@ class ExportUploadOperator(Operator):
         self.report({"INFO"}, "Preparing upload..")
         self.create_session()
 
-        suffix = ".glb"
-        with NamedTemporaryFile(suffix=suffix) as tmp_file:
-            file_path = tmp_file.name
+        def threaded_execution():
+            suffix = ".glb"
+            with NamedTemporaryFile(suffix=suffix) as tmp_file:
+                file_path = tmp_file.name
 
-            self.report({"INFO"}, "Exporting Project..")
-            bpy.ops.export_scene.upload(filepath=file_path[:-len(suffix)])
+                self.report({"INFO"}, "Exporting Project..")
+                bpy.ops.export_scene.gltf(filepath=file_path[:-len(suffix)])
 
-            self.report({"INFO"}, "Uploading Output..")
-            self.upload(file_path, context)
-            self.open_viewer()
+                self.report({"INFO"}, "Uploading Output..")
+                self.upload(file_path, context)
+                self.open_viewer()
 
-            self.report({"INFO"}, "Finished!")
+                self.report({"INFO"}, "Finished!")
+
+        import threading
+        threading.Thread(target=threaded_execution).start()
 
         return {"FINISHED"}
 
