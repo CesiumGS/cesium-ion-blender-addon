@@ -15,6 +15,6 @@ Blender add-on for uploading and tiling models with Cesium ion. https://cesium.c
 ![](https://i.imgur.com/MwFY1Xk.png)
 5. Open the export panel in the *View3D* menu
 <p align="center">
-  <img width="400" src="https://i.imgur.com/yHzzGpc.png" hspace="20">
-  <img width="400" src="https://i.imgur.com/73DIulW.png" hspace="20">
+  <img width="390" src="https://i.imgur.com/yHzzGpc.png" hspace="20">
+  <img width="390" src="https://i.imgur.com/73DIulW.png" hspace="20">
 </p>
