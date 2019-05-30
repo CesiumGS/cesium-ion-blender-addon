@@ -68,6 +68,4 @@ class ExportPanel(Panel):
             layout.operator(ExportUploadOperator.bl_idname,
                             text="Upload to Cesium ion")
         else:
-            layout.operator(OAuthOperator.bl_idname,
-                            text="Login",
-                            icon="EXPORT")
+            layout.operator(OAuthOperator.bl_idname, text="Login")
