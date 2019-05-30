@@ -19,7 +19,7 @@ class ExportProperties(PropertyGroup):
     attribution: StringProperty(
         name="Attribution",
         description="Acknowledge the particular author, artist, or coporation")
-    source_type: EnumProperty(name="Source Type",
+    source_type: EnumProperty(name="Model Type",
                               description="Type of data being uploaded",
                               items=lambda self, context: SOURCE_TYPES)
     webp_textures: BoolProperty(
@@ -53,14 +53,14 @@ class ExportPanel(Panel):
 
             layout.prop(scene.csm_export, "name")
             if len(csm_export.name) <= 0:
-                layout.label(text="Set name before export...")
+                layout.label(text="Name is required.")
 
             layout.prop(scene.csm_export, "description")
             layout.prop(scene.csm_export, "attribution")
             layout.separator()
             layout.prop(scene.csm_export, "source_type")
             if csm_export.source_type is "":
-                layout.label(text="Set source type before export...")
+                layout.label(text="Model Type is required.")
 
             layout.prop(scene.csm_export, "webp_textures")
             layout.operator(ExportUploadOperator.bl_idname,
