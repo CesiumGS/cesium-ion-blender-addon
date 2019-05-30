@@ -8,7 +8,7 @@ if LOCAL:
     API_ADDRESS = "http://api.composer.test:8081"
 else:
     CLIENT_ID = "19"
-    ION_ADDRESS = "https://cesium.com/ion"
+    ION_ADDRESS = "https://cesium.com"
     API_ADDRESS = "https://api.cesium.com"
 REDIRECT_ADDRESS = "localhost"
 REDIRECT_PORT = 10101
