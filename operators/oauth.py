@@ -31,7 +31,7 @@ class OAuthOperator(Operator):
             "response_type": "code",
             "client_id": self.client_id,
             "redirect_uri": self.redirect_uri,
-            "scope": "assets:write assets:read",
+            "scope": "assets:write",
             "code_challenge": self.code_challenge,
             "code_challenge_method": "S256"
         })

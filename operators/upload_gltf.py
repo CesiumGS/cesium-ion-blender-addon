@@ -46,6 +46,9 @@ class ExportUploadOperator(Operator):
     name: StringProperty()
     description: StringProperty()
     attribution: StringProperty()
+    source_type: EnumProperty(items=[("3D_MODEL", "",
+                                      ""), ("3D_CAPTURE", "", "")])
+    webp_textures: BoolProperty(default=False)
 
     @staticmethod
     def setup_boto():
@@ -56,14 +59,15 @@ class ExportUploadOperator(Operator):
 
             parent_dir = path.sep.join(
                 path.abspath(__file__).split(path.sep)[:-2])
-            vendor_dir = path.join(parent_dir, "vendor")
+            third_party_dir = path.join(parent_dir, "third_party")
 
-            sys.path.append(vendor_dir)
+            sys.path.append(third_party_dir)
 
     @classmethod
     def poll(self, context):
         csm_user, csm_export = context.window_manager.csm_user, context.scene.csm_export
-        return len(csm_user.token) > 0 and len(csm_export.name) > 0
+        return len(csm_user.token) > 0 and len(csm_export.name) > 0 and len(
+            csm_export.source_type) > 0
 
     @property
     def headers(self):
@@ -80,8 +84,8 @@ class ExportUploadOperator(Operator):
             "attribution": self.attribution,
             "type": "3DTILES",
             "options": {
-                "sourceType": "3D_MODEL",
-                "textureFormat": "AUTO"
+                "sourceType": self.source_type,
+                "textureFormat": "WEBP" if self.webp_textures else "AUTO"
             }
         }
         req = requests.post(f"{API_ADDRESS}/v1/assets",
@@ -161,5 +165,7 @@ class ExportUploadOperator(Operator):
         self.name = csm_export.name
         self.description = csm_export.description
         self.attribution = csm_export.attribution
+        self.source_type = csm_export.source_type
+        self.webp_textures = csm_export.webp_textures
         self.session = None
         return self.execute(context)

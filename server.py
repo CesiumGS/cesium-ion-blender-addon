@@ -20,14 +20,18 @@ class AbstractTokenHandler(BaseHTTPRequestHandler):
 
         script_dir = path.dirname(path.realpath(__file__))
         file_path = path.join(script_dir, "index.html")
-        with open(file_path, "rb") as file:
-            data = file.read()
-            self.wfile.write(data)
 
         params = parse_qs(self.path[2:])
-
+        auth_status = "<h2>Authorization Denied!</h2>"
         if "code" in params:
-            Thread(target=self.client.stop).start()
+            auth_status = "<span>Authorization Complete!</span><h3>Return to blender to begin your export!</h3>"
+
+        with open(file_path, "r") as file:
+            data = file.read().replace("%RESPONSE%", auth_status)
+            self.wfile.write(data.encode())
+
+        Thread(target=self.client.stop).start()
+        if "code" in params:
             self.listener(params["code"][0])
 
 

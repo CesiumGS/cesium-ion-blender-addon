@@ -1,5 +1,5 @@
 bl_info = {
-    "name": "Cesium Ion",
+    "name": "Cesium ion",
     "description":
     "Upload and tile models with Cesium ion. https://cesium.com",
     "author": "",
@@ -40,8 +40,8 @@ from .panels import *
 from .cache import load_properties
 
 __classes__ = [
-    UserProperties, UserPanel, ExportProperties, ExportPanel, OAuthOperator,
-    GetTokenOperator, ClearTokenOperator, ExportUploadOperator, UserPreferences
+    UserProperties, UserPreferences, ExportProperties, ExportPanel,
+    OAuthOperator, GetTokenOperator, ClearTokenOperator, ExportUploadOperator
 ]
 
 register_classes, unregister_classes = bpy.utils\
@@ -59,15 +59,6 @@ def register():
         load_properties(bpy.context.window_manager.csm_user)
 
     bpy.app.handlers.load_post.append(on_load)
-
-    # Handle save menu path
-    def create_menu(self, context):
-        self.layout.operator(ExportUploadOperator.bl_idname,
-                             text="Upload to Cesium ion")
-
-    print(bpy.types)
-
-    bpy.types.TOPBAR_MT_file_export.append(create_menu)
 
 
 def unregister():

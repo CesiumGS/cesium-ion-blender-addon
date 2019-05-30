@@ -6,42 +6,20 @@ from ..operators import (OAuthOperator, ClearTokenOperator)
 from ..globals import (APP_CATEGORY, APP_PACKAGE)
 
 
-class AccountManageMixin(object):
-    def draw(self, context):
-        layout = self.layout
-        csm_user = context.window_manager.csm_user
-        csm_user_len = len(csm_user.token)
-        status_text = "Linked" if csm_user_len > 0 else "Disconnected"
-        layout.row().label(text=f"Status: {status_text}")
-
-        if csm_user_len <= 0:
-            layout.operator(OAuthOperator.bl_idname, text="Authorize")
-        else:
-            layout.operator(ClearTokenOperator.bl_idname, text="Logout")
-
-
 class UserProperties(PropertyGroup):
     token: StringProperty()
 
 
-class UserPreferences(AccountManageMixin, AddonPreferences):
+class UserPreferences(AddonPreferences):
     bl_idname = APP_PACKAGE
 
     def draw(self, context):
-        super().draw(context)
-
         layout = self.layout
-        layout.separator()
-        layout.label(
-            text="Exporting to Cesium ion will not work unless " +
-            "authorization has completed. Please ensure that the above " +
-            "text says \"Linked\". For more information, checkout the " +
-            "documentation.")
+        csm_user_len = len(context.window_manager.csm_user.token)
+        status_text = "Logged In" if csm_user_len > 0 else "Disconnected"
+        layout.row().label(text=f"Status: {status_text}")
 
-
-class UserPanel(AccountManageMixin, Panel):
-    bl_idname = "CESIUM_PT_user"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_label = "Account"
-    bl_category = APP_CATEGORY
+        if csm_user_len <= 0:
+            layout.operator(OAuthOperator.bl_idname, text="Login")
+        else:
+            layout.operator(ClearTokenOperator.bl_idname, text="Logout")
