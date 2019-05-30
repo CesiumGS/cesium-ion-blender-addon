@@ -14,16 +14,16 @@ SOURCE_TYPES = [
 class ExportProperties(PropertyGroup):
     name: StringProperty(name="Name", description="Title for the upload")
     description: StringProperty(
-        name="Description:",
+        name="Description",
         description="Give an overview of the contents of the data")
     attribution: StringProperty(
-        name="Attribution:",
+        name="Attribution",
         description="Acknowledge the particular author, artist, or coporation")
     source_type: EnumProperty(name="Source Type",
                               description="Type of data being uploaded",
                               items=lambda self, context: SOURCE_TYPES)
     webp_textures: BoolProperty(
-        name="Convert to WebP:",
+        name="Convert to WebP",
         default=False,
         description=
         "Will produce WebP images, which are typically 25-34% smaller than " +
