@@ -37,7 +37,7 @@ class S3ProgressPercentage(object):
 
 class ExportUploadOperator(Operator):
     bl_label = "gltf to Cesium uploader"
-    bl_idname = f"{APP_OPERATOR_PREFIX}.upload_gltf"
+    bl_idname = f"{APP_OPERATOR_PREFIX}.upload"
     bl_description = "Uploads your model to Cesium ion for 3D Tiling"
 
     api_address: StringProperty(default=API_ADDRESS)
@@ -148,8 +148,7 @@ class ExportUploadOperator(Operator):
             file_path = tmp_file.name
 
             self.report({"INFO"}, "Exporting Project..")
-            bpy.ops.export_scene.gltf(filepath=file_path[:-len(suffix)])
-            print(file_path)
+            bpy.ops.export_scene.upload(filepath=file_path[:-len(suffix)])
 
             self.report({"INFO"}, "Uploading Output..")
             self.upload(file_path, context)
