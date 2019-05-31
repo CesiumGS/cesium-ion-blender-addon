@@ -1,7 +1,7 @@
 from bpy.props import *
 from bpy.types import (Panel, PropertyGroup)
 
-from ..operators import (ExportUploadOperator, OAuthOperator)
+from ..operators import (ExportUploadOperator, OAuthOperator, ProgressOperator)
 from ..globals import APP_CATEGORY
 
 SOURCE_TYPES = [
@@ -34,6 +34,10 @@ class ExportProperties(PropertyGroup):
         "Chrome or Firefox 65 and newer.")
 
 
+class ProgressProperty(PropertyGroup):
+    value: FloatProperty(default=0)
+
+
 class ExportPanel(Panel):
     bl_idname = "CESIUM_PT_export"
     bl_space_type = "VIEW_3D"
@@ -49,15 +53,31 @@ class ExportPanel(Panel):
             name = property_group.__annotations__[property_id][1]["name"]
             row.label(text=f"{name} is required.", icon="ERROR")
 
+    def progress_bar(self, progress, layout=None):
+        if layout is None:
+            layout = self.layout
+        container = layout.row()
+
+        label_container = container.row()
+        label_container.alignment = "LEFT"
+        label_container.label(text=f"{int(progress * 100)}%")
+
+        progress_container = container.row().split(factor=progress)
+        progress_container.operator(ProgressOperator.bl_idname,
+                                    text="",
+                                    depress=True)
+
     def draw(self, context):
         layout = self.layout
         layout.alignment = "LEFT"
 
         csm_export = context.scene.csm_export
         csm_user_len = len(context.window_manager.csm_user.token)
+        progress = context.window_manager.csm_progress.value
 
-        if csm_user_len > 0:
-
+        if progress > 0:
+            self.progress_bar(progress)
+        elif csm_user_len > 0:
             self.required_prop(csm_export, "name")
             layout.prop(csm_export, "description")
             layout.prop(csm_export, "attribution")

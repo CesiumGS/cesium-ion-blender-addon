@@ -41,7 +41,8 @@ from .cache import load_properties
 
 __classes__ = [
     UserProperties, UserPreferences, ExportProperties, ExportPanel,
-    OAuthOperator, GetTokenOperator, ClearTokenOperator, ExportUploadOperator
+    OAuthOperator, GetTokenOperator, ClearTokenOperator, ExportUploadOperator,
+    ProgressOperator, ProgressProperty
 ]
 
 register_classes, unregister_classes = bpy.utils\
@@ -52,6 +53,8 @@ def register():
     register_classes()
     bpy.types.WindowManager.csm_user = PointerProperty(type=UserProperties)
     bpy.types.Scene.csm_export = PointerProperty(type=ExportProperties)
+    bpy.types.WindowManager.csm_progress = PointerProperty(
+        type=ProgressProperty)
 
     # Update login persistence
     @persistent
@@ -65,4 +68,5 @@ def unregister():
     unregister_classes()
     del bpy.types.WindowManager.csm_user
     del bpy.types.Scene.csm_export
+    del bpy.types.WindowManager.csm_progress
     OAuthOperator.stop()
