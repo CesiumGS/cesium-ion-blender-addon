@@ -3,33 +3,13 @@ bl_info = {
     "description":
     "Upload and tile models with Cesium ion. https://cesium.com",
     "author": "Analytical Graphics, Inc.",
+    "wiki_url":
+    "https://github.com/AnalyticalGraphicsInc/ion-blender-exporter",
     "version": (1, 0),
     "blender": (2, 80, 0),
-    "location": "View3D",
+    "location": "View3D > Cesium ion",
     "category": "Import-Export"
 }
-
-
-# RELOAD PACKAGE on Refresh
-def reload_package(module_dict_main):
-    import importlib
-    from pathlib import Path
-
-    def reload_package_recursive(current_dir, module_dict):
-        for path in current_dir.iterdir():
-            if "__init__" in str(path) or path.stem not in module_dict:
-                continue
-
-            if path.is_file() and path.suffix == ".py":
-                importlib.reload(module_dict[path.stem])
-            elif path.is_dir():
-                reload_package_recursive(path, module_dict[path.stem].__dict__)
-
-    reload_package_recursive(Path(__file__).parent, module_dict_main)
-
-
-if "bpy" in locals():
-    reload_package(locals())
 
 import bpy
 from bpy.props import PointerProperty
