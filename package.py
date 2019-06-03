@@ -70,6 +70,8 @@ def get_latest_version(org, repo, version_param_length=2):
     return version
 
 
+APP_NAME = 'io-cesium-ion'
+
 if __name__ == "__main__":
     script_dir = os.path.dirname(__file__)
     module_dir = os.path.join(script_dir, "io-cesium-ion")
@@ -97,13 +99,15 @@ if __name__ == "__main__":
     tracked_files = get_tracked_files(module_dir)
     bar = ProgressBar(len(tracked_files), prefix="Zipping ")
 
-    zip_file_name = f'io-cesium-ion-{format_version(local_version)}.zip'
+    zip_file_name = f'{APP_NAME}-{format_version(local_version)}.zip'
     zipf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
+    zip_path = ''
     for file_path in tracked_files:
         zip_rel_path = os.path.relpath(file_path, module_dir)
-        zipf.write(file_path, zip_rel_path)
+        zipf.write(file_path, os.path.join(APP_NAME, zip_rel_path))
         bar.update(1)
 
-    zipf.writestr(os.path.join(script_dir, "LICENSE"), "LICENSE")
+    zipf.writestr(os.path.join(script_dir, "LICENSE"),
+                  os.path.join(APP_NAME, "LICENSE"))
     print(f"Zip written to {zip_file_name}")
     zipf.close()
