@@ -3,6 +3,7 @@ import re
 import sys
 import json
 import zipfile
+import subprocess
 import urllib.error, urllib.request
 
 
@@ -26,13 +27,21 @@ class ProgressBar(object):
             print()
 
 
-def zipdir(path, ziph, on_write=None):
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            abs_path = os.path.join(root, file)
-            zip_rel_path = os.path.relpath(os.path.join(root, file), path)
-            ziph.write(abs_path, zip_rel_path)
-            on_write(abs_path, zip_rel_path)
+def get_tracked_files(folder=None):
+    files = subprocess.check_output("git ls-files", shell=True)\
+        .decode()\
+        .splitlines()
+
+    if folder is not None:
+        folder = os.path.abspath(folder)
+        old_files = files
+        files = []
+        for file in old_files:
+            abs_path = os.path.abspath(file)
+            if abs_path.startswith(folder):
+                files.append(file)
+
+    return files
 
 
 def error(msg):
@@ -85,16 +94,16 @@ if __name__ == "__main__":
               "\"bl_info\" must be newer than the last \"Release Version\" " +
               f"({format_version(released_version)})")
 
-    print("Preparing to zip...")
-    total_files = sum(len(files) for x, y, files in os.walk(module_dir))
-    bar = ProgressBar(total_files, prefix="Zipping ")
-
-    def on_write(x, y):
-        bar.update(1)
+    tracked_files = get_tracked_files(module_dir)
+    bar = ProgressBar(len(tracked_files), prefix="Zipping ")
 
     zip_file_name = f'io-cesium-ion-{format_version(local_version)}.zip'
     zipf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
-    zipdir(module_dir, zipf, on_write=on_write)
+    for file_path in tracked_files:
+        zip_rel_path = os.path.relpath(file_path, module_dir)
+        zipf.write(file_path, zip_rel_path)
+        bar.update(1)
+
     zipf.writestr(os.path.join(script_dir, "LICENSE"), "LICENSE")
     print(f"Zip written to {zip_file_name}")
     zipf.close()
