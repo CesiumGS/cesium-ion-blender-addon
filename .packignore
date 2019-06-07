@@ -1,0 +1,6 @@
+.DS_Store
+/*__pycache__/
+*.py[cod]
+*$py.class
+io-cesium-ion-*.zip
+docutils/

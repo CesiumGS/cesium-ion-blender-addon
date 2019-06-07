@@ -1,8 +1,8 @@
 import os
 import re
 import sys
-import getopt
 import json
+import fnmatch
 import zipfile
 import subprocess
 from shutil import rmtree
@@ -29,21 +29,19 @@ class ProgressBar(object):
             print()
 
 
-def get_tracked_files(folder=None):
-    files = subprocess.check_output("git ls-files", shell=True)\
-        .decode()\
-        .splitlines()
+def match_files(folder, ignores=[]):
+    excludes = r'|'.join([fnmatch.translate(x) for x in ignores]) or r'$.'
 
-    if folder is not None:
-        folder = os.path.abspath(folder)
-        old_files = files
-        files = []
-        for file in old_files:
-            abs_path = os.path.abspath(file)
-            if abs_path.startswith(folder):
-                files.append(file)
+    all_files = []
+    for root, dirs, files in os.walk(folder):
+        dirs[:] = [os.path.join(root, d) for d in dirs]
+        dirs[:] = [d for d in dirs if not re.match(excludes, d)]
 
-    return files
+        # exclude/include files
+        files = [os.path.join(root, f) for f in files]
+        files = [f for f in files if not re.match(excludes, f)]
+        all_files.extend(files)
+    return all_files
 
 
 def error(msg):
@@ -75,7 +73,7 @@ def get_latest_version(org, repo, version_param_length=2):
 APP_NAME = "io-cesium-ion"
 
 
-def package(module_dir, license_path, app_name=APP_NAME):
+def package(module_dir, license_path, ignores=None, app_name=APP_NAME):
     script_path = os.path.join(module_dir, "__init__.py")
     print("Identifying version...")
     with open(script_path, "r") as init_script:
@@ -97,18 +95,18 @@ def package(module_dir, license_path, app_name=APP_NAME):
               "\"bl_info\" must be newer than the last \"Release Version\" " +
               f"({format_version(released_version)})")
 
-    tracked_files = get_tracked_files(module_dir)
-    bar = ProgressBar(len(tracked_files), prefix="Zipping ")
+    package_files = match_files(module_dir, ignores=ignores)
+    bar = ProgressBar(len(package_files), prefix="Zipping ")
 
     zip_file_name = f"{app_name}-{format_version(local_version)}.zip"
     zipf = zipfile.ZipFile(zip_file_name, "w", zipfile.ZIP_DEFLATED)
     zip_path = ""
-    for file_path in tracked_files:
+    for file_path in package_files:
         zip_rel_path = os.path.relpath(file_path, module_dir)
         zipf.write(file_path, os.path.join(app_name, zip_rel_path))
         bar.update(1)
 
-    zipf.writestr(license_path, os.path.join(app_name, "LICENSE"))
+    zipf.write(license_path, os.path.join(app_name, "LICENSE"))
     print(f"Zip written to {zip_file_name}")
     zipf.close()
 
@@ -143,7 +141,9 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))
     module_dir = os.path.join(script_dir, APP_NAME)
     if command == "PACKAGE":
-        package(module_dir, os.path.join(script_dir, "LICENSE"))
+        with open(os.path.join(script_dir, ".packignore")) as packignore:
+            ignores = [line.rstrip('\n') for line in packignore.readlines()]
+        package(module_dir, os.path.join(script_dir, "LICENSE"), ignores)
     elif command == "VENDOR":
         install_third_party(module_dir)
     else:
