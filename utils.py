@@ -113,27 +113,6 @@ def package(module_dir, license_path, ignores=None, app_name=APP_NAME):
     zipf.close()
 
 
-def install_third_party(module_dir, modules=["boto3"]):
-    print("Checking for old third_party...")
-    vendor_dir = os.path.join(module_dir, "third_party")
-    tmp_vendor_dir = os.path.join(module_dir, "tmp_third_party")
-    if os.path.isdir(vendor_dir):
-        print("Removing old vendor dir...")
-        rmtree(vendor_dir)
-
-    print("Installing vendor (Ignore non-exitting errors)...")
-    subprocess.check_output([sys.executable, "-m", "pip", "install"] +
-                            modules +
-                            [f"--install-option=--prefix={tmp_vendor_dir}"])
-
-    print("Cleaning up...")
-    packages_dir = next(Path(tmp_vendor_dir).glob("**/site-packages"))
-    move_dir(packages_dir, vendor_dir)
-    rmtree(tmp_vendor_dir)
-
-    print("Installation Successful")
-
-
 if __name__ == "__main__":
     command = None
     if len(sys.argv) >= 2:
@@ -145,10 +124,6 @@ if __name__ == "__main__":
         with open(os.path.join(script_dir, ".packignore")) as packignore:
             ignores = [line.rstrip('\n') for line in packignore.readlines()]
         package(module_dir, os.path.join(script_dir, "LICENSE"), ignores)
-    elif command == "VENDOR":
-        print("THIS COMMAND IS EXPERIMENTAL")
-        install_third_party(module_dir)
     else:
         print("python3 utils.py arg")
         print("\t package - build a zip for distribution")
-        print("\t vendor - update or install third_party directory from pip")
