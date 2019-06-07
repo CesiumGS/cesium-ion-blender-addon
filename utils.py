@@ -146,6 +146,7 @@ if __name__ == "__main__":
             ignores = [line.rstrip('\n') for line in packignore.readlines()]
         package(module_dir, os.path.join(script_dir, "LICENSE"), ignores)
     elif command == "VENDOR":
+        print("THIS COMMAND IS EXPERIMENTAL")
         install_third_party(module_dir)
     else:
         print("python3 utils.py arg")

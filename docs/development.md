@@ -1,7 +1,6 @@
 # Development
 ## Setup
 1. `git clone git@github.com:AnalyticalGraphicsInc/ion-blender-exporter.git` - Clone the repository
-1. `python3 utils.py vendor` - Install the third party python modules in the application root.
 1. Create a symlink from `./io-cesium-ion` to the your platform specific addon directory *(see below)*. The symlink be  similar to `[Blender Path]/addons/io-cesium-ion`.
     - **Windows:** `C:\Program Files\Blender Foundation\blender\[version]\addons`
     - **OSX:** `Users/[USER]/Library/Application Support/Blender/[version]/scripts/addons/`
@@ -19,7 +18,6 @@ Releases are available on the [downloads page](https://github.com/AnalyticalGrap
     * The utils script will check for an increased version number upon packaging but it is good practice to check the version number is increased on your own.
 1. Check that [globals.py](https://github.com/AnalyticalGraphicsInc/ion-blender-exporter/blob/master/globals.py) has the correct parameters.
     * Ensure that `LOCAL = FALSE`
-1. Run `python3 utils.py vendor` inside the root folder to update the third party python requirements.
 1. Run `python3 utils.py package` inside the root folder to build `io-cesium-ion-v0.0.zip`
 ### Testing
 _If any file fails to export or fails in an unintended way the release process is stopped and a issue is created._

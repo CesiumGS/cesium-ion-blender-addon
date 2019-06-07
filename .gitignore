@@ -3,5 +3,4 @@ __pycache__/
 *.py[cod]
 *$py.class
 io-cesium-ion-*.zip
-third_party/
 tmp_third_party/
