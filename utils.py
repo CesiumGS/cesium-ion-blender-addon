@@ -2,10 +2,12 @@ import os
 import re
 import sys
 import json
+import shutil
 import fnmatch
 import zipfile
 import subprocess
-from shutil import rmtree
+from pathlib import Path
+from shutil import rmtree, move as move_dir
 import urllib.error, urllib.request
 
 
@@ -114,23 +116,22 @@ def package(module_dir, license_path, ignores=None, app_name=APP_NAME):
 def install_third_party(module_dir, modules=["boto3"]):
     print("Checking for old third_party...")
     vendor_dir = os.path.join(module_dir, "third_party")
+    tmp_vendor_dir = os.path.join(module_dir, "tmp_third_party")
     if os.path.isdir(vendor_dir):
         print("Removing old vendor dir...")
         rmtree(vendor_dir)
 
-    print("Setting up third_party")
-    os.mkdir(vendor_dir)
-    vendor_config = os.path.join(vendor_dir, "setup.cfg")
-    with open(vendor_config, "w") as config:
-        config.write("[install]\nprefix=")
-
     print("Installing vendor (Ignore non-exitting errors)...")
     subprocess.check_output([sys.executable, "-m", "pip", "install"] +
-                            modules + ["-t", vendor_dir],
-                            cwd=vendor_dir)
+                            modules +
+                            [f"--install-option=--prefix={tmp_vendor_dir}"])
+
+    print("Cleaning up...")
+    packages_dir = next(Path(tmp_vendor_dir).glob("**/site-packages"))
+    move_dir(packages_dir, vendor_dir)
+    rmtree(tmp_vendor_dir)
+
     print("Installation Successful")
-    print("Cleaning up")
-    os.remove(vendor_config)
 
 
 if __name__ == "__main__":
