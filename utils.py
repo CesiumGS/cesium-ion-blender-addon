@@ -1,9 +1,11 @@
 import os
 import re
 import sys
+import getopt
 import json
 import zipfile
 import subprocess
+from shutil import rmtree
 import urllib.error, urllib.request
 
 
@@ -70,11 +72,10 @@ def get_latest_version(org, repo, version_param_length=2):
     return version
 
 
-APP_NAME = 'io-cesium-ion'
+APP_NAME = "io-cesium-ion"
 
-if __name__ == "__main__":
-    script_dir = os.path.dirname(__file__)
-    module_dir = os.path.join(script_dir, "io-cesium-ion")
+
+def package(module_dir, license_path, app_name=APP_NAME):
     script_path = os.path.join(module_dir, "__init__.py")
     print("Identifying version...")
     with open(script_path, "r") as init_script:
@@ -99,15 +100,53 @@ if __name__ == "__main__":
     tracked_files = get_tracked_files(module_dir)
     bar = ProgressBar(len(tracked_files), prefix="Zipping ")
 
-    zip_file_name = f'{APP_NAME}-{format_version(local_version)}.zip'
-    zipf = zipfile.ZipFile(zip_file_name, 'w', zipfile.ZIP_DEFLATED)
-    zip_path = ''
+    zip_file_name = f"{app_name}-{format_version(local_version)}.zip"
+    zipf = zipfile.ZipFile(zip_file_name, "w", zipfile.ZIP_DEFLATED)
+    zip_path = ""
     for file_path in tracked_files:
         zip_rel_path = os.path.relpath(file_path, module_dir)
-        zipf.write(file_path, os.path.join(APP_NAME, zip_rel_path))
+        zipf.write(file_path, os.path.join(app_name, zip_rel_path))
         bar.update(1)
 
-    zipf.writestr(os.path.join(script_dir, "LICENSE"),
-                  os.path.join(APP_NAME, "LICENSE"))
+    zipf.writestr(license_path, os.path.join(app_name, "LICENSE"))
     print(f"Zip written to {zip_file_name}")
     zipf.close()
+
+
+def install_third_party(module_dir, modules=["boto3"]):
+    print("Checking for old third_party...")
+    vendor_dir = os.path.join(module_dir, "third_party")
+    if os.path.isdir(vendor_dir):
+        print("Removing old vendor dir...")
+        rmtree(vendor_dir)
+
+    print("Setting up third_party")
+    os.mkdir(vendor_dir)
+    vendor_config = os.path.join(vendor_dir, "setup.cfg")
+    with open(vendor_config, "w") as config:
+        config.write("[install]\nprefix=")
+
+    print("Installing vendor (Ignore non-exitting errors)...")
+    subprocess.check_output([sys.executable, "-m", "pip", "install"] +
+                            modules + ["-t", vendor_dir],
+                            cwd=vendor_dir)
+    print("Installation Successful")
+    print("Cleaning up")
+    os.remove(vendor_config)
+
+
+if __name__ == "__main__":
+    command = None
+    if len(sys.argv) >= 2:
+        command = sys.argv[1].upper()
+
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    module_dir = os.path.join(script_dir, APP_NAME)
+    if command == "PACKAGE":
+        package(module_dir, os.path.join(script_dir, "LICENSE"))
+    elif command == "VENDOR":
+        install_third_party(module_dir)
+    else:
+        print("python3 utils.py arg")
+        print("\t package - build a zip for distribution")
+        print("\t vendor - update or install third_party directory from pip")
