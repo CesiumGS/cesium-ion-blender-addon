@@ -22,9 +22,16 @@ class ProgressBar(object):
     def update(self, count):
         self.total_count += count
         x = int(self.size * self.total_count / self.total)
-        self.file.write("%s[%s%s] %i/%i\r" %
-                        (self.prefix, "#" * x, "." *
-                         (self.size - x), self.total_count, self.total))
+        self.file.write(
+            "%s[%s%s] %i/%i\r"
+            % (
+                self.prefix,
+                "#" * x,
+                "." * (self.size - x),
+                self.total_count,
+                self.total,
+            )
+        )
         self.file.flush()
 
         if self.total_count == self.total:
@@ -32,7 +39,7 @@ class ProgressBar(object):
 
 
 def match_files(folder, ignores=[]):
-    excludes = r'|'.join([fnmatch.translate(x) for x in ignores]) or r'$.'
+    excludes = r"|".join([fnmatch.translate(x) for x in ignores]) or r"$."
 
     all_files = []
     for root, dirs, files in os.walk(folder):
@@ -66,8 +73,8 @@ def get_latest_version(org, repo, version_param_length=2):
     if "tag_name" not in data:
         version = ()
     else:
-        version = re.sub(r"[^0-9\.]", "", data["tag_name"]).split(".")
-    version += (0, ) * (version_param_length - len(version))
+        version = tuple(map(int, re.sub(r"[^0-9\.]", "", data["tag_name"]).split(".")))
+    version += (0,) * (version_param_length - len(version))
 
     return version
 
@@ -79,23 +86,24 @@ def package(module_dir, license_path, ignores=None, app_name=APP_NAME):
     script_path = os.path.join(module_dir, "__init__.py")
     print("Identifying version...")
     with open(script_path, "r") as init_script:
-        bl_info_raw = re.findall(r"bl_info\s*=\s*(\{[^}]+\})",
-                                 init_script.read())
+        bl_info_raw = re.findall(r"bl_info\s*=\s*(\{[^}]+\})", init_script.read())
         if len(bl_info_raw) != 1:
-            error("Unable to find bl_info expected 1 found " +
-                  f"{len(bl_info_raw)}")
+            error("Unable to find bl_info expected 1 found " + f"{len(bl_info_raw)}")
         bl_info = eval(bl_info_raw[0])
 
     local_version = bl_info["version"]
     released_version = get_latest_version(
         "AnalyticalGraphicsInc",
         "ion-blender-exporter",
-        version_param_length=len(local_version))
+        version_param_length=len(local_version),
+    )
 
     if local_version <= released_version:
-        error(f"\"Local Version\" ({format_version(local_version)}) in " +
-              "\"bl_info\" must be newer than the last \"Release Version\" " +
-              f"({format_version(released_version)})")
+        error(
+            f'"Local Version" ({format_version(local_version)}) in '
+            + '"bl_info" must be newer than the last "Release Version" '
+            + f"({format_version(released_version)})"
+        )
 
     package_files = match_files(module_dir, ignores=ignores)
     bar = ProgressBar(len(package_files), prefix="Zipping ")
@@ -122,7 +130,7 @@ if __name__ == "__main__":
     module_dir = os.path.join(script_dir, APP_NAME)
     if command == "PACKAGE":
         with open(os.path.join(script_dir, ".packignore")) as packignore:
-            ignores = [line.rstrip('\n') for line in packignore.readlines()]
+            ignores = [line.rstrip("\n") for line in packignore.readlines()]
         package(module_dir, os.path.join(script_dir, "LICENSE"), ignores)
     else:
         print("python3 utils.py arg")
