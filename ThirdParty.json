@@ -1,7 +1,12 @@
 [
-    {
-      "name": "boto3",
-      "url": "https://github.com/boto/boto3",
-      "license": "Apache-2.0"
-    }
+	{
+		"name": "boto3",
+		"url": "https://github.com/boto/boto3",
+		"license": "Apache-2.0"
+	},
+	{
+		"name": "six",
+		"url": "https://pypi.org/project/six/",
+		"license": "MIT"
+	}
 ]
