@@ -2,9 +2,7 @@ Thanks for contributing. You rock!
 
 # Submitting an Issue
 
-All issues are tracked as part of the [cesium-ion-community](https://github.com/AnalyticalGraphicsInc/cesium-ion-community) repository.
-
-If you think you've found a bug, first search the [issues](https://github.com/AnalyticalGraphicsInc/cesium-ion-community/issues) there. If an issue already exists, please add a comment expressing your interest and any additional information. This helps us prioritize issue. If you are unable to find an existing issue, please create a new one with as much information needed for us to reproduce the problem or implement a feature.
+If you think you've found a bug, please search existing [issues](https://github.com/AnalyticalGraphicsInc/cesium-ion-blender-addon/issues) before submitting. If an issue already exists, please add a comment expressing your interest and any additional information. This helps us prioritize issue. If you are unable to find an existing issue, please create a new one with as much information needed for us to reproduce the problem or implement a feature.
 
 # Getting Started Contributing
 
@@ -22,14 +20,12 @@ If you plan to make a major change, please start or comment on an [issue](https:
 
 ## Contributor License Agreement (CLA)
 
-Before we can merge a pull request, we require a signed Contributor License Agreement. There is a CLA for:
+Before we can review a pull request, we require a signed Contributor License Agreement. This only needs to be completed once, and enables contributions to all of the projects under the [Analytical Graphics Inc](https://github.com/AnalyticalGraphicsInc) organization, including CesiumJS.  The CLA ensures you retain copyright to your contributions, and provides us the right to use, modify, and redistribute your contributions using the [Apache 2.0 License](LICENSE.md). There is a CLA for:
 
-* [individuals](Documentation/Contributors/CLAs/individual-cla-agi-v1.0.txt) and
-* [corporations](Documentation/Contributors/CLAs/corporate-cla-agi-v1.0.txt).
+* [individuals](https://docs.google.com/forms/d/e/1FAIpQLScU-yvQdcdjCFHkNXwdNeEXx5Qhu45QXuWX_uF5qiLGFSEwlA/viewform) and
+* [corporations](https://docs.google.com/forms/d/e/1FAIpQLSeYEaWlBl1tQEiegfHMuqnH9VxyfgXGyIw13C2sN7Fj3J3GVA/viewform).
 
-This only needs to be completed once, and enables contributions to all of the projects under the [Analytical Graphics Inc](https://github.com/AnalyticalGraphicsInc) organization, including CesiumJS. The CLA ensures you retain copyright to your contributions, and provides us the right to use, modify, and redistribute your contributions using the [Apache 2.0 License](LICENSE.md).
-
-Please email a completed CLA with all fields filled in to [cla@agi.com](mailto:cla@agi.com). Related questions are also welcome.
+If you have any questions, feel free to reach out to [hello@cesium.com](mailto:hello@cesium)!
 
 # Code of Conduct
 

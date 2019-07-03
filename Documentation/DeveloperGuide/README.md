@@ -59,7 +59,7 @@ Once all tests have pass, we can actually publish the release.
  - [Create new release](https://github.com/AnalyticalGraphicsInc/cesium-ion-blender-addon/releases/new).
  - Select the tag you use pushed
  - Enter `Cesium ion Blender Addon 1.x` for the title
- - Include date, list of highlights and link to CHANGES.md (https://github.com/AnalyticalGraphicsInc/cesium-ion-blender-addon/blob/1.xx/CHANGES.md) as the description
+ - In the description, include the date, list of highlights and permalink to CHANGES.md, which is in the format https://github.com/AnalyticalGraphicsInc/cesium-ion-blender-addon/blob/1.xx/CHANGES.md, where 1.xx is the version number.
  - Attach the `io-cesium-ion-vx.x.x.zip` you generated during the build process.
  - Publish the release
 1. Tell the outreach team about the new release to have it included in the monthly release announcements/blog post and on social media.
