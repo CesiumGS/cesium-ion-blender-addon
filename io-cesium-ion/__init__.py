@@ -1,9 +1,9 @@
 bl_info = {
     "name": "Cesium ion",
     "description": "Upload and tile models with Cesium ion. https://cesium.com",
-    "author": "Analytical Graphics, Inc.",
-    "wiki_url": "https://github.com/AnalyticalGraphicsInc/ion-blender-exporter",
-    "version": (1, 1),
+    "author": "Cesium GS, Inc.",
+    "wiki_url": "https://github.com/AnalyticalGraphicsInc/cesium-ion-blender-addon",
+    "version": (1, 0, 0),
     "blender": (2, 80, 0),
     "location": "View3D > Cesium ion",
     "category": "Import-Export",
