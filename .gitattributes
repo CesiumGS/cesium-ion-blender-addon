@@ -3,3 +3,4 @@ io-cesium-ion/third_party/* linguist-vendored
 Documentation/* linguist-documentation
 *.md linguist-documentation
 test-assets/* linguist-detectable=false
+io-cesium-ion/index.html linguist-detectable=false
